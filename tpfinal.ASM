@@ -31,6 +31,9 @@ varError db "EL NUMERO INGRESADO NO ES VALIDO",0dh,0ah,24h
  extrn ubicarj1:proc
  extrn ubicarCom:proc
  extrn ubicarVs:proc
+ extrn ubicarCursor1:proc
+ extrn ubicarCursor2:proc
+
 
      main proc
         mov ax, @data
@@ -86,10 +89,7 @@ call bordeInf ;LLAMA AL BORDE INFERIOR -----------------------------------------
 
 
 ;----------------------UBICA AL CURSOR ----------------------------------------------------------------------
-mov ah,02h
-mov dh,10
-mov dl,26
-int 10h
+call ubicarCursor1
 
 mov ah,09h
 mov dx,offset elegir ;IMPRIME CARTEL PARA ELEGIR OPCION -------------------------------------------------------
