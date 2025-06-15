@@ -5,6 +5,7 @@
 .data
 
 Bienvenido db "PIEDRA, PAPEL O TIJERA!!",24h
+ingresarNick db "INGRESE SU NICKNAME: ",24h
 tecla db "PRESS ENTER...",24h
 elegir db"INGRESE SU OPCION",0dh,24h
 OPC db"1.PIEDRA      "
@@ -13,14 +14,18 @@ OPC db"1.PIEDRA      "
 empate db "EMPATE!!!!!!",24h
 perdiste db "PERDISTE!!!!!",24h
 ganaste db "GANASTE!!!!!!",24h
-vuelve db "VUELVE A JUGAR PRESIONE S, PARA SALIR PRESIONE N",24h
+vuelve db "VUELVE A JUGAR PRESIONE S, PARA SALIR PRESIONE N: ",24h
 varPiedra db "PIEDRA",0DH, 0AH,24H
 varPapel db "PAPEL",0DH, 0AH,24H
 varTijera db "TIJERA",0DH, 0AH,24H
 varVersus db "VS",0DH, 0AH,24H
 score db "0:0", 0dh,0ah,24h
-puntaje db "---------SCORE------------", 0dh,0ah,24h
+puntaje   db "---------SCORE------------", 0dh,0ah,24h
+jugadores db "          VS INTEL 8086", 0dh,0ah,24h
 varError db "EL NUMERO INGRESADO NO ES VALIDO",0dh,0ah,24h
+
+nickname db 10 dup(24h)
+
 .code
 
  extrn RANDOM:proc
@@ -31,6 +36,7 @@ varError db "EL NUMERO INGRESADO NO ES VALIDO",0dh,0ah,24h
  extrn ubicarj1:proc
  extrn ubicarCom:proc
  extrn ubicarVs:proc
+ extrn ingresoNick:proc
 
      main proc
         mov ax, @data
@@ -52,8 +58,36 @@ mov dl,26
 int 10h
 
 
-mov bx,offset bienvenido ;IMPRIME CARTEL DE BIENVENIDA 
+mov bx,offset Bienvenido ;IMPRIME CARTEL DE BIENVENIDA 
 call imprimir ;LLAMA A LA FUNCION IMPRIMIR PARA IMPRIMIR EL CARTEL DE INICIO DEL JUEGO -----------------------
+
+;----------------------UBICA AL CURSOR ----------------------------------------------------------------------
+mov ah,02h
+mov dh,11 ; Fila 11
+mov dl,26 ; Columna 0
+int 10h
+
+
+mov bx,offset ingresarNick ;IMPRIME INDICADOR PARA QUE EL USUARIO INGRESE SU APODO
+call imprimir ;LLAMA A LA FUNCION IMPRIMIR PARA IMPRIMIR EL CARTEL DE INICIO DEL JUEGO -----------------------
+
+mov dx, offset nickname ;Atraves de dx retorno el texto que ingresa el usuario en el procedimiento "ingreso_texto"
+call ingresoNick
+
+mov al, nickname[0]
+mov jugadores[5],al
+
+mov al, nickname[1]
+mov jugadores[6],al
+
+mov al, nickname[2]
+mov jugadores[7],al
+
+mov al, nickname[3]
+mov jugadores[8],al
+
+
+
 
 
 ;----------------------UBICA AL CURSOR ----------------------------------------------------------------------
@@ -115,7 +149,7 @@ int 10h
 
 ;----------------------IMPRIME BORDE INFERIOR ---------------------------------------------------------------
 mov ah,09h
-mov al,'='
+mov al,'*'
 mov bl,10
 mov cx,80
 int 10h
@@ -332,9 +366,22 @@ mov ah, 9
 mov dx, offset puntaje
 int 21h
 
-;UBICA EL CURSOR DE JUGADOR 1-------------------------------------------------------------------------------
 mov ah,02h
 mov dh,5
+mov dl,25
+int 10h
+
+mov ah, 9
+mov dx, offset jugadores
+int 21h
+
+;mov bx,offset jugadores ;IMPRIME LOS JUGADORES
+;call imprimir ;LLAMA A LA FUNCION IMPRIMIR-----------------------
+
+
+;UBICA EL CURSOR DE JUGADOR 1-------------------------------------------------------------------------------
+mov ah,02h
+mov dh,6
 mov dl,35
 int 10h
 
@@ -420,11 +467,14 @@ je nos
 jmp nin ;*
 
 sis:
+mov score[0], 30h
+mov score[2], 30h
 
 jmp sigue
 
 nos: 
 
+    int 80h
 
     mov ax, 4c00h
     int 21h

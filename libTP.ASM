@@ -13,6 +13,7 @@
     public ubicarj1
     public ubicarCom
     public ubicarVs
+    public ingresoNick
     
 
 ;GENERA UN NUMERO ALEATORIO QUE VA A SER EL VALOR QUE ELIGE LA MAQUINA PARA JUGAR.
@@ -71,7 +72,7 @@ int 10h
 
 ;imprimir el ═ superior
 mov ah,09h
-mov al,'='
+mov al,'*'
 mov bl,10
 mov cx,80
 int 10h
@@ -85,7 +86,7 @@ int 10h
 
 ;imprimir el ═ superior
 mov ah,09h
-mov al,'='
+mov al,'*'
 mov bl,10
 mov cx,80
 int 10h
@@ -117,7 +118,7 @@ bordeInf PROC
 
 ;imprimir el ═ inferior
 mov ah,09h
-mov al,'='
+mov al,'*'S
 mov bl,10
 mov cx,80
 int 10h
@@ -131,7 +132,7 @@ int 10h
 
 ;imprimir el ═ inferior
 mov ah,09h
-mov al,'='
+mov al,'*'
 mov bl,10
 mov cx,80
 int 10h
@@ -264,4 +265,54 @@ ubicarVs PROC
     pop ax
     ret
 ubicarVs ENDP
+
+ingresoNick proc
+
+      push dx
+      push bx
+      push ax
+      push cx
+
+      mov bx,dx ; offset buffer_texto en bx
+
+      mov ax,dx
+
+      mov ax, 0
+      limpiar_buffer:
+      cmp ax,10
+      je fin_limpieza_buffer
+      mov byte ptr [bx], 20h
+      inc bx
+      inc ax
+      jmp limpiar_buffer
+
+      fin_limpieza_buffer:
+      mov bx,dx ; offset buffer_texto en bx
+      xor cx,cx
+
+      ingreso_texto_usuario:
+        mov ah,1
+        int 21h
+        cmp al, 0dh ; Si se presiona enter se finaliza el ingreso
+        je ingreso_texto_fin
+
+
+        mov byte ptr [bx], al
+        inc bx
+        inc cx
+
+        cmp cx, 4 ; si la cantidad de caracteres ingresadas es igual a 4 finaliza el ingreso.
+        je ingreso_texto_fin
+
+        jmp ingreso_texto_usuario
+
+      ingreso_texto_fin:
+        pop cx
+        pop ax
+        pop bx
+        pop dx
+
+      ret
+    ingresoNick endp
+
 end
