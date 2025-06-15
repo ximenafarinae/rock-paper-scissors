@@ -4,27 +4,26 @@
 
 .data
 
-Bienvenido db "PIEDRA, PAPEL O TIJERA!!",24h
-ingresarNick db "INGRESE SU NICKNAME: ",24h
-tecla db "PRESS ENTER...",24h
-elegir db"INGRESE SU OPCION",0dh,24h
-OPC db"1.PIEDRA      "
-    db "2.PAPEL      "
-    db "3.TIJERA     ",24h
-empate db "EMPATE!!!!!!",24h
-perdiste db "PERDISTE!!!!!",24h
-ganaste db "GANASTE!!!!!!",24h
-vuelve db "VUELVE A JUGAR PRESIONE S, PARA SALIR PRESIONE N: ",24h
-varPiedra db "PIEDRA",0DH, 0AH,24H
-varPapel db "PAPEL",0DH, 0AH,24H
-varTijera db "TIJERA",0DH, 0AH,24H
-varVersus db "VS",0DH, 0AH,24H
-score db "0:0", 0dh,0ah,24h
-puntaje   db "---------SCORE------------", 0dh,0ah,24h
-jugadores db "          VS INTEL 8086", 0dh,0ah,24h
-varError db "EL NUMERO INGRESADO NO ES VALIDO",0dh,0ah,24h
-
-nickname db 10 dup(24h)
+Bienvenido   db "PIEDRA, PAPEL O TIJERA!!", 24h
+ingresarNick db "INGRESE SU NICKNAME: ", 24h
+tecla        db "PRESS ENTER...", 24h
+elegir       db "INGRESE SU OPCION", 0dh, 24h
+OPC          db "1.PIEDRA      "
+             db "2.PAPEL      "
+             db "3.TIJERA     ", 24h
+empate       db "EMPATE!!!!!!", 24h
+perdiste     db "PERDISTE!!!!!", 24h
+ganaste      db "GANASTE!!!!!!", 24h
+vuelve       db "VUELVE A JUGAR PRESIONE S, PARA SALIR PRESIONE N: ",24h
+varPiedra    db "PIEDRA", 0DH, 0AH, 24H
+varPapel     db "PAPEL", 0DH, 0AH, 24H
+varTijera    db "TIJERA", 0DH, 0AH, 24H
+varVersus    db "VS", 0DH, 0AH, 24H
+score        db "0:0", 0dh, 0ah, 24h
+puntaje      db "------------SCORE------------", 0dh, 0ah, 24h
+jugadores    db "          VS INTEL 8086", 0dh, 0ah, 24h
+varError     db "EL NUMERO INGRESADO NO ES VALIDO", 0dh, 0ah, 24h
+nickname     db 10 dup(24h)
 
 .code
 
