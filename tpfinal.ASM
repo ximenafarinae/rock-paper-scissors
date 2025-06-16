@@ -23,6 +23,48 @@ puntaje      db "------------SCORE------------", 0dh, 0ah, 24h
 jugadores    db "          VS INTEL 8086", 0dh, 0ah, 24h
 varError     db "EL NUMERO INGRESADO NO ES VALIDO", 0dh, 0ah, 24h
 nickname     db 10 dup(24h)
+theme       DW  659,6    ; E5 ♫ corchea
+            DW  659,6    ; E5
+            DW    0,6    ; silencio
+            DW  659,6    ; E5
+            DW    0,12   ; silencio negra
+            DW  523,6    ; C5
+            DW  659,6    ; E5
+            DW  784,12   ; G5 negra
+            DW  392,12   ; G4
+            DW    0,12   ; silencio negra
+
+            DW  523,6    ; C5
+            DW  392,6    ; G4
+            DW    0,6    ; silencio
+            DW  330,6    ; E4
+            DW    0,12   ; silencio negra
+            DW  440,6    ; A4
+            DW  494,12   ; B4
+            DW  466,6    ; Bb4
+            DW  440,12   ; A4
+
+            DW  392,6    ; G4
+            DW  659,6    ; E5
+            DW  784,6    ; G5
+            DW  880,6    ; A5
+            DW  698,6    ; F5
+            DW  784,6    ; G5
+            DW    0,6    ; silencio
+
+            DW  659,6    ; E5
+            DW    0,6    ; silencio
+            DW  523,6    ; C5
+            DW  587,6    ; D5
+            DW  494,12   ; B4
+            DW    0,12   ; silencio
+
+            DW  523,6    ; C5
+            DW  392,6    ; G4
+            DW  330,6    ; E4
+            DW  294,6    ; D4
+            DW  262,12   ; C4
+            DW 0FFFFh,0  ; <— fin de tabla
 
 .code
  extrn RANDOM:proc
@@ -36,12 +78,16 @@ nickname     db 10 dup(24h)
  extrn ingresoNick:proc
  extrn compara:proc
  extrn getMainIntro:proc
+ extrn playSequence:proc
 
 main proc
    mov ax, @data
    mov ds, ax
 
    call getMainIntro
+
+   lea si, theme
+   call playSequence
 
 int 80h               ;LLAMA A LA INT 80 QUE LIMPIA LA PANTALLA----------------------------------------------
 xor ax, ax

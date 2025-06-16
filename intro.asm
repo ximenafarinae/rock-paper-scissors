@@ -51,6 +51,7 @@ longitudOtroMsj equ ($-otroMsj)/2
 .CODE
 
     public getMainIntro
+    public playSequence
 
 getMainIntro proc
     pushf           ; salvar flags
@@ -161,5 +162,113 @@ getIntro PROC NEAR
     pop     ax
     ret
 getIntro ENDP
+
+;------------------------------------------------------------------------------
+; playTone PROC: genera un tono por PC-speaker
+; In: DX = frecuencia en Hz (ej. 440), CX = duración en ciclos de 'pausa'
+; Destroy: AX, BX
+;------------------------------------------------------------------------------
+playTone PROC NEAR
+    ; Entradas:
+    ;   DX = frecuencia en Hz (ej. 440)
+    ;   CX = duración en “ciclos” de tu rutina pausa
+    ; Clobbers: AX,BX,DX,CX
+    push    ax
+    push    bx
+    push    cx
+    push    dx
+
+    ; 1) pon la frecuencia en BX (va a ser el divisor)
+    mov     bx, dx
+
+    ; 2) carga 1193180 en DX:AX
+    mov     dx, 012h       ; parte alta de 1193180 (1193180 \ 65536 = 18 = 0x12)
+    mov     ax, 34DCh      ; parte baja de 1193180 (1193180 mod 65536 = 0x34DC)
+
+    ; 3) divide el 32-bit DX:AX entre BX (nuestra frecuencia)
+    div     bx             ; ahora AX = divisor para el PIT
+
+    ; 4) programa PIT canal 2 en modo 3 (square wave)
+    mov     al, 0B6h       ; 1011_0110b = canal2, LSB/MSB, modo3, binario
+    out     43h, al
+    mov     bx, ax         ; guardo divisor en BX
+    mov     al, bl         ; LSB
+    out     42h, al
+    mov     al, bh         ; MSB
+    out     42h, al
+
+    ; 5) habilita el speaker (bits 0 y 1 del puerto 61h)
+    in      al, 61h
+    or      al, 03h
+    out     61h, al
+
+    ; 6) espera CX ciclos de tu pausa
+.repeatDelay:
+    call    pausa
+    loop    .repeatDelay
+
+    ; 7) deshabilita el speaker
+    in      al, 61h
+    and     al, 0FCh       ; limpia bits 0 y 1
+    out     61h, al
+
+    pop     dx
+    pop     cx
+    pop     bx
+    pop     ax
+    ret
+playTone ENDP
+
+; -----------------------------------------------------------------------------
+; playSequence PROC: recorre una tabla de parejas (freq,dur) y llama a playTone
+;   SI = offset de la tabla
+;   CX, DX y lo que use playTone quedan libres (los vamos a preservar nosotros)
+; -----------------------------------------------------------------------------
+;----------------------------------------------------------------------------
+; playSequence PROC NEAR
+;   Reproduce una tabla de pares <freq,duración> y se detiene
+;   cuando freq=0FFFFh (sentinel). Los silencios (freq=0,dur>0) se
+;   reproducen como pausas normales.
+;
+; IN:  SI = offset de la tabla
+;       tabla: DW freq1, dur1, freq2, dur2, …, 0FFFFh,0
+; Destroy: AX, CX, DX
+;----------------------------------------------------------------------------
+
+playSequence PROC NEAR
+    push    si
+    push    cx
+    push    dx
+
+.nextNote:
+    mov     ax, [si]         ; AX = freq
+    cmp     ax, 0FFFFh       ; ¿sentinel de fin?
+    je      .doneSeq
+
+    ; Si freq = 0 → silencio: simplemente retraso 'dur' ciclos de pausa
+    mov     dx, ax           ; DX = freq (puede ser 0)
+    mov     ax, [si+2]       ; AX = duración
+    mov     cx, ax           ; CX = duración
+
+    cmp     dx, 0
+    jne     .playTone        ; si freq<>0 → tono normal
+    ; --- silencio ---
+    call    pausa            ; pausa ajustable según CX
+    jmp     .advance
+
+.playTone:
+    call    playTone
+    ; (playTone consume CX en duración)
+
+.advance:
+    add     si, 4            ; avanzar al siguiente par freq/dur
+    jmp     .nextNote
+
+.doneSeq:
+    pop     dx
+    pop     cx
+    pop     si
+    ret
+playSequence ENDP
 
 END inicio
