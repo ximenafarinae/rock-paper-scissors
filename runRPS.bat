@@ -4,5 +4,6 @@ tlink /t intClear.obj
 intClear.com
 tasm /zi tpfinal.asm
 tasm /zi libtp.asm
-tlink /v tpfinal.obj libtp.obj
+tasm /zi intro.asm
+tlink /v tpfinal.obj libtp.obj intro.obj
 tpfinal.exe

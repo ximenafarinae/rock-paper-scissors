@@ -35,10 +35,13 @@ nickname     db 10 dup(24h)
  extrn ubicarVs:proc
  extrn ingresoNick:proc
  extrn compara:proc
+ extrn getMainIntro:proc
 
-     main proc
-        mov ax, @data
-        mov ds, ax
+main proc
+   mov ax, @data
+   mov ds, ax
+
+   call getMainIntro
 
 int 80h               ;LLAMA A LA INT 80 QUE LIMPIA LA PANTALLA----------------------------------------------
 xor ax, ax
