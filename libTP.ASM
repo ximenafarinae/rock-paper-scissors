@@ -3,7 +3,6 @@
 .stack 100h
 .data
 .code
-
     public random
     public CalcNew
     public bordeSup
@@ -14,8 +13,7 @@
     public ubicarCom
     public ubicarVs
     public ingresoNick
-    
-
+    public compara
 ;GENERA UN NUMERO ALEATORIO QUE VA A SER EL VALOR QUE ELIGE LA MAQUINA PARA JUGAR.
 random PROC
 ;DEVUELVE UN NUMERO DE1 1 AL 3 EN DL
@@ -49,7 +47,6 @@ CalcNew PROC
     ret 
 CalcNew ENDP  
 
-
 ;description
 bordeSup PROC
     push ax
@@ -68,7 +65,6 @@ mov ah,02h
 mov dh,2
 mov dl,0
 int 10h
-
 
 ;imprimir el ═ superior
 mov ah,09h
@@ -118,7 +114,7 @@ bordeInf PROC
 
 ;imprimir el ═ inferior
 mov ah,09h
-mov al,'*'S
+mov al,'*'
 mov bl,10
 mov cx,80
 int 10h
@@ -314,5 +310,60 @@ ingresoNick proc
 
       ret
     ingresoNick endp
+
+    compara PROC
+        CMP BL, BH
+        JNE no_empate
+        
+        ; Caso de empate
+        MOV AL, 0
+        RET
+
+no_empate:
+        ; Determinar elección del jugador
+        CMP BL, '1'
+        JE jugador_piedra
+        CMP BL, '2'
+        JE jugador_papel
+        CMP BL, '3'
+        JE jugador_tijera
+        
+        ; Opción inválida (tratar como derrota)
+        MOV AL, 2
+        RET
+
+jugador_piedra:
+        CMP BH, '2'
+        JE cpu_gana
+        CMP BH, '3'
+        JE jugador_gana
+        JMP opcion_invalida
+
+jugador_papel:
+        CMP BH, '1'
+        JE jugador_gana
+        CMP BH, '3'
+        JE cpu_gana
+        JMP opcion_invalida
+
+jugador_tijera:
+        CMP BH, '1'
+        JE cpu_gana
+        CMP BH, '2'
+        JE jugador_gana
+        JMP opcion_invalida
+
+jugador_gana:
+        MOV AL, 1
+        RET
+
+cpu_gana:
+        MOV AL, 2
+        RET
+
+opcion_invalida:
+        MOV AL, 2  ; Tratar opción inválida como derrota
+        RET
+compara ENDP
 
 end
