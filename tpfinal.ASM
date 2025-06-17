@@ -138,6 +138,7 @@ int 21h
 
 mov ah, 01h
 int 21h
+
 cmp al, 0dh           ;COMPARA LO QUE VIENE POR TECLADO CON ENTER
 je sigue
 jmp teclaEnt
@@ -150,9 +151,39 @@ int 80h              ;LLAMA A LA INT 80 QUE LIMPIA LA PANTALLA------------------
 call bordeSup        ;LLAMA AL BORDE SUPERIOR -------------------------------------------------------------
 call bordeInf        ;LLAMA AL BORDE INFERIOR -------------------------------------------------------------
 
+mov ah, 02h             ;UBICA AL CURSOR -----------------------------------------------------------------
+mov dh, 4
+mov dl, 25
+int 10h
+
+mov ah, 9
+mov dx, offset puntaje
+int 21h
+
+mov ah, 02h              ;UBICA AL CURSOR ----------------------------------------------------------------
+mov dh, 5
+mov dl, 25
+int 10h
+
+mov ah, 9
+mov dx, offset jugadores
+int 21h
+
+;mov bx, offset jugadores ;IMPRIME LOS JUGADORES
+;call imprimir ;LLAMA A LA FUNCION IMPRIMIR-----------------------
+
+mov ah, 02h           ;UBICA AL CURSOR JUGADOR 1 ---------------------------------------------------------
+mov dh, 6
+mov dl, 35
+int 10h
+
+mov ah, 9
+mov dx, offset score
+int 21h
+
 mov ah, 02h          ;UBICA AL CURSOR ---------------------------------------------------------------------
 mov dh, 10
-mov dl, 26
+mov dl, 30
 int 10h
 
 mov bx, offset elegir
@@ -160,7 +191,7 @@ call imprimir
 
 mov ah, 02h          ;UBICA AL CURSOR ---------------------------------------------------------------------
 mov dh, 15
-mov dl, 15
+mov dl, 22
 int 10h
 
 mov ah, 09h
@@ -187,6 +218,7 @@ mal:                ;SALTO PARA CONTROLAR ERRORES DE INGRESO POR TECLADO--------
 xor al, al
 mov ah, 01h
 int 21h
+
 ; ELECCION DEL JUGADOR --------------------------------------------------------------------
 cmp al, '1'
 je va
@@ -389,7 +421,7 @@ mov dx, offset vuelve   ;IMPRIME CARTEL DE LA POSIBILIDAD DE ELEGIR ENTRE VOLVER
 int 21h
 
 pregunto:
-mov ah, 1
+mov ah, 01h
 int 21h
 
 cmp al, 'S'
