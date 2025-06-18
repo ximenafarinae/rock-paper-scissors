@@ -300,7 +300,7 @@ prosigue:
 comespiedra2:
    call ubicarCom ; UBICA EN LA PANTALLA LA OPCION DE LA CPU ---------------------------------------------
 
-   mov ah, 9 
+   mov ah, 09h 
    mov dl, offset varPiedra ;IMPRIME LA PALABRA "PIEDRA"--------------------------------------------------
    int 21h
 
