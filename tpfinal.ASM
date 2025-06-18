@@ -23,6 +23,9 @@ puntaje      db "------------SCORE------------", 0dh, 0ah, 24h
 jugadores    db "          VS INTEL 8086", 0dh, 0ah, 24h
 varError     db "EL NUMERO INGRESADO NO ES VALIDO", 0dh, 0ah, 24h
 nickname     db 10 dup(24h)
+partidas  db "-------PARTIDAS--------", 0dh,0ah,24h
+recordJugador db 0
+recordIntel db 0
 theme       DW  659,6    ; E5 ♫ corchea
             DW  659,6    ; E5
             DW    0,6    ; silencio
@@ -81,6 +84,7 @@ theme       DW  659,6    ; E5 ♫ corchea
  extrn playSequence:proc
  extrn getLose:proc
  extrn getWin:proc
+ extrn record_to_ascii:proc
 
 main proc
    mov ax, @data
@@ -425,7 +429,8 @@ fin:
 
 finfin1:
    int 80h                ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------------
-
+   inc recordJugador
+   
    call getWin
 
    lea si, theme
@@ -436,12 +441,37 @@ finfin1:
 finfin2:
    int 80h
 
+   inc recordIntel
+
    call getLose
 
    lea si, theme
    call playSequence
     
 volver:
+   mov ah,02h
+   mov dh,4
+   mov dl,25
+   int 10h
+
+
+   mov ah, 9
+   mov dx, offset partidas
+   int 21h
+
+   mov ah,02h
+   mov dh,5
+   mov dl,25
+   int 10h
+
+   mov ah, 9
+   mov dx, offset jugadores
+   int 21h
+   
+   push offset recordIntel ;
+   push offset recordJugador ; 
+   call record_to_ascii
+
    mov ah, 02h           ;UBICA AL CURSOR -------------------------------------------------------------------
    mov dh, 19
    mov dl, 14
