@@ -79,6 +79,8 @@ theme       DW  659,6    ; E5 ♫ corchea
  extrn compara:proc
  extrn getMainIntro:proc
  extrn playSequence:proc
+ extrn getLose:proc
+ extrn getWin:proc
 
 main proc
    mov ax, @data
@@ -424,20 +426,21 @@ fin:
 finfin1:
    int 80h                ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------------
 
-   call ubicarCentro
+   call getWin
 
-   mov bx, offset ganaste ;IMPRIME LA PALABRA GANASTE ------------------------------------------------------
-   call imprimir
+   lea si, theme
+   call playSequence
 
    jmp volver
 
 finfin2:
    int 80h
-   call ubicarCentro
-   
-   mov bx, offset perdiste ;IMPRIME LA PALABRA PERDISTE -------------------------------------------------------
-   call imprimir
 
+   call getLose
+
+   lea si, theme
+   call playSequence
+    
 volver:
    mov ah, 02h           ;UBICA AL CURSOR -------------------------------------------------------------------
    mov dh, 19
