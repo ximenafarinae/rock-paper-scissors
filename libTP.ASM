@@ -2,6 +2,7 @@
 .model small
 .stack 100h
 .data
+    print_record db "000:000",0dh,0ah,24h
 .code
     public random
     public CalcNew
@@ -14,6 +15,8 @@
     public ubicarVs
     public ingresoNick
     public compara
+    public record_to_ascii
+
 ;GENERA UN NUMERO ALEATORIO QUE VA A SER EL VALOR QUE ELIGE LA MAQUINA PARA JUGAR.
 random PROC
 ;DEVUELVE UN NUMERO DE1 1 AL 3 EN DL
@@ -366,4 +369,68 @@ opcion_invalida:
         RET
 compara ENDP
 
+record_to_ascii proc
+push bp
+mov bp, sp
+push ax
+push dx
+push si
+
+xor ax,ax
+xor dx,dx
+
+mov print_record[0],30h
+mov print_record[1],30h
+mov print_record[2],30h
+mov print_record[4],30h
+mov print_record[5],30h
+mov print_record[6],30h
+
+mov si, ss:[bp+4] ;Parametro, valor record de jugador a imprimir en pantalla
+mov al, byte ptr [si]
+
+mov dl, 100 
+div dl 
+add print_record[0],al
+
+mov al, ah 
+xor ah, ah 
+mov dl, 10
+div dl 
+add print_record[1],al
+add print_record[2],ah
+
+xor ax,ax
+mov si, ss:[bp+6] ;Parametro, valor record de intel a imprimir en pantalla
+mov al, byte ptr [si]
+
+mov dl, 100 
+div dl 
+add print_record[4],al
+
+mov al, ah 
+xor ah, ah 
+mov dl, 10
+div dl 
+add print_record[5],al
+add print_record[6],ah
+
+print:
+
+mov ah,02h
+mov dh,6
+mov dl,33
+int 10h
+
+mov ah, 9
+mov dx, offset print_record
+int 21h
+
+pop si
+pop dx
+pop ax
+pop bp
+
+ret 4
+record_to_ascii endp
 end
