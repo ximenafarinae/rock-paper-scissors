@@ -118,7 +118,7 @@ getMainIntro endp
 ; rutina simple de retardo
 pausa PROC NEAR
     push cx
-    mov cx, 2F00h
+    mov cx, 7FFFh
 delay:
     loop delay
     pop cx

@@ -104,11 +104,11 @@ mov bx, offset Bienvenido  ;IMPRIME CARTEL DE BIENVENIDA
 call imprimir              ;LLAMA A LA FUNCION IMPRIMIR PARA IMPRIMIR EL CARTEL DE INICIO DEL JUEGO -------
 
 mov ah, 02h                ;UBICA AL CURSOR ---------------------------------------------------------------
-mov dh, 11 ; Fila 11
-mov dl, 26 ; Columna 0
+mov dh, 11
+mov dl, 26 
 int 10h
 
-mov bx,offset ingresarNick ;IMPRIME INDICADOR PARA QUE EL USUARIO INGRESE SU APODO
+mov bx, offset ingresarNick ;IMPRIME INDICADOR PARA QUE EL USUARIO INGRESE SU APODO
 call imprimir              ;LLAMA A LA FUNCION IMPRIMIR PARA IMPRIMIR EL CARTEL DE INICIO DEL JUEGO -------
 
 mov dx, offset nickname    ;Atraves de dx retorno el texto q ingresa el usu. en el proce. "ingreso_texto"
@@ -127,32 +127,64 @@ mov al, nickname[3]
 mov jugadores[8], al
 
 teclaEnt:
-mov ah, 02h           ;UBICA AL CURSOR ---------------------------------------------------------------------
-mov dh, 15
-mov dl, 30
+   mov ah, 02h           ;UBICA AL CURSOR ---------------------------------------------------------------------
+   mov dh, 15
+   mov dl, 30
+   int 10h
+
+   mov ah, 09h
+   mov dx, offset tecla  ;IMPRIME CARTEL PARA PRESIONAR ENTER -------------------------------------------------
+   int 21h
+
+   mov ah, 01h
+   int 21h
+
+   cmp al, 0dh           ;COMPARA LO QUE VIENE POR TECLADO CON ENTER
+   je sigue
+
+   jmp teclaEnt
+
+sigue:  
+   xor si, si
+   xor di, di
+
+   int 80h              ;LLAMA A LA INT 80 QUE LIMPIA LA PANTALLA---------------------------------------------
+   call bordeSup        ;LLAMA AL BORDE SUPERIOR -------------------------------------------------------------
+   call bordeInf        ;LLAMA AL BORDE INFERIOR -------------------------------------------------------------
+
+   mov ah, 02h             ;UBICA AL CURSOR -----------------------------------------------------------------
+   mov dh, 4
+   mov dl, 25
+   int 10h
+
+   mov ah, 09h
+   mov dx, offset puntaje
+   int 21h
+
+   mov ah, 02h              ;UBICA AL CURSOR ----------------------------------------------------------------
+   mov dh, 5
+   mov dl, 25
+   int 10h
+
+   mov ah, 09h
+   mov dx, offset jugadores
+   int 21h
+
+;mov bx, offset jugadores ;IMPRIME LOS JUGADORES
+;call imprimir ;LLAMA A LA FUNCION IMPRIMIR-----------------------
+
+mov ah, 02h           ;UBICA AL CURSOR JUGADOR 1 ---------------------------------------------------------
+mov dh, 6
+mov dl, 35
 int 10h
 
 mov ah, 09h
-mov dx, offset tecla  ;IMPRIME CARTEL PARA PRESIONAR ENTER -------------------------------------------------
+mov dx, offset score
 int 21h
-
-mov ah, 01h
-int 21h
-cmp al, 0dh           ;COMPARA LO QUE VIENE POR TECLADO CON ENTER
-je sigue
-jmp teclaEnt
-
-sigue:  
-xor si, si
-xor di, di
-
-int 80h              ;LLAMA A LA INT 80 QUE LIMPIA LA PANTALLA---------------------------------------------
-call bordeSup        ;LLAMA AL BORDE SUPERIOR -------------------------------------------------------------
-call bordeInf        ;LLAMA AL BORDE INFERIOR -------------------------------------------------------------
 
 mov ah, 02h          ;UBICA AL CURSOR ---------------------------------------------------------------------
 mov dh, 10
-mov dl, 26
+mov dl, 30
 int 10h
 
 mov bx, offset elegir
@@ -160,7 +192,7 @@ call imprimir
 
 mov ah, 02h          ;UBICA AL CURSOR ---------------------------------------------------------------------
 mov dh, 15
-mov dl, 15
+mov dl, 22
 int 10h
 
 mov ah, 09h
@@ -184,229 +216,257 @@ mov dl, 0
 int 10h
 
 mal:                ;SALTO PARA CONTROLAR ERRORES DE INGRESO POR TECLADO-----------------------------
-xor al, al
-mov ah, 01h
-int 21h
-; ELECCION DEL JUGADOR --------------------------------------------------------------------
-cmp al, '1'
-je va
-cmp al, '2'
-je va
-cmp al, '3'
-je va                ;* VER PARA CONTROLAR ERROR DE ENTER hacer cartel de error 
-mov bx, offset varError
-call imprimir
-jmp mal
+   xor al, al
+
+   mov ah, 01h
+   int 21h
+
+   ; ELECCION DEL JUGADOR --------------------------------------------------------------------
+   cmp al, '1'
+   je va
+   cmp al, '2'
+   je va
+   cmp al, '3'
+   je va                ;* VER PARA CONTROLAR ERROR DE ENTER hacer cartel de error 
+   mov bx, offset varError
+   call imprimir
+   jmp mal
 va:
-mov bl, al      ;EN BL TENGO LA OPCION ELEGIDA POR EL USUARIO ------------------------------
+   mov bl, al      ;EN BL TENGO LA OPCION ELEGIDA POR EL USUARIO ------------------------------
 
-call RANDOM     ;LLAMO A LA FUNCION RANDOM -------------------------------------------------
-int 80h         ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------
-mov bh, dl      ;QUEDA EN BH LA OPCION DE LA CPU, QUE VIENE DE RANDOM ----------------------
+   call RANDOM     ;LLAMO A LA FUNCION RANDOM -------------------------------------------------
+   int 80h         ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------
+   mov bh, dl      ;QUEDA EN BH LA OPCION DE LA CPU, QUE VIENE DE RANDOM ----------------------
 
-;======================= IMPRIME LA OPCION QUE ELIGIO EL JUGADOR ===========================
-        cmp bl, '1'
-        je comespiedra
-        cmp bl, '2'
-        je comespapel
-        cmp bl, '3'
-        je comestijera
+   ;======================= IMPRIME LA OPCION QUE ELIGIO EL JUGADOR ===========================
+   cmp bl, '1'
+   je comespiedra
+   cmp bl, '2'
+   je comespapel
+   cmp bl, '3'
+   je comestijera
+
  comespiedra:
     call ubicarj1 ;------UBICA LA RESPUESTA DEL JUGADOR 1 EN LA PANTALLA ----------------------------------
-    mov ah, 9 
+    
+    mov ah, 09h 
     mov dl, offset varPiedra ;IMPRIME LA PALABRA "PIEDRA"--------------------------------------------------
     int 21h
+    
     call ubicarVs ;IMPRIME LA PALABRA "VS"-----------------------------------------------------------------
-    mov ah, 9
+    
+    mov ah, 09h
     mov dl, offset varVersus
     int 21h
+    
     jmp prosigue
  comespapel:
-     call ubicarj1 ;------UBICA LA RESPUESTA DEL JUGADOR 1 EN LA PANTALLA ---------------------------------
-    mov ah, 9 
+    call ubicarj1 ;------UBICA LA RESPUESTA DEL JUGADOR 1 EN LA PANTALLA ---------------------------------
+    
+    mov ah, 09h
     mov dl, offset varPapel ;IMPRIME LA PALABRA "PAPEL"----------------------------------------------------
     int 21h
+    
     call ubicarVs ;--------LLAMO A LA FUNCION QUE UBICA VS EN LA PANTALLA ----------------------------------
-    mov ah, 9
+    
+    mov ah, 09h
     mov dl, offset varVersus ;IMPRIME LA PALABRA "VS"-----------------------------------------------------
     int 21h
+    
     jmp prosigue
+ 
  comestijera:
     call ubicarj1 ;------UBICA LA RESPUESTA DEL JUGADOR 1 EN LA PANTALLA ---------------------------------
-    mov ah, 9 
+    
+    mov ah, 09h 
     mov dl, offset varTijera ;IMPRIME LA PALABRA "TIJERA"-------------------------------------------------
     int 21h
+    
     call ubicarVs ;--------LLAMO A LA FUNCION QUE UBICA VS EN LA PANTALLA --------------------------------
-    mov ah, 9
+    
+    mov ah, 09h
     mov dl, offset varVersus ;IMPRIME LA PALABRA "VS"-----------------------------------------------------
     int 21h
+    
     jmp prosigue
 ;======================= IMPRIME LA OPCION QUE ELIGIO EL CPU ===========================
 prosigue:    
-        cmp bh, '1'
-        je comespiedra2
-        cmp bh, '2'
-        je comespapel2
-        cmp bh, '3'
-        je comestijera2
- comespiedra2:
-    call ubicarCom ; UBICA EN LA PANTALLA LA OPCION DE LA CPU ---------------------------------------------
-    mov ah, 9 
-    mov dl, offset varPiedra ;IMPRIME LA PALABRA "PIEDRA"--------------------------------------------------
-    int 21h
-    jmp comparajugadas
- comespapel2:
-    call ubicarCom
-    mov ah, 9 
-    mov dl, offset varPapel ;IMPRIME LA PALABRA "PAPEL"----------------------------------------------------
-    int 21h
-    jmp comparajugadas
- comestijera2:
-    call ubicarCom
-    mov ah, 9 
-    mov dl, offset varTijera ;IMPRIME LA PALABRA "TIJERA"--------------------------------------------------
-    int 21h
-    jmp comparajugadas
+   cmp bh, '1'
+   je comespiedra2
+   cmp bh, '2'
+   je comespapel2
+   cmp bh, '3'
+   je comestijera2
+comespiedra2:
+   call ubicarCom ; UBICA EN LA PANTALLA LA OPCION DE LA CPU ---------------------------------------------
+
+   mov ah, 09h 
+   mov dl, offset varPiedra ;IMPRIME LA PALABRA "PIEDRA"--------------------------------------------------
+   int 21h
+
+   jmp comparajugadas
+comespapel2:
+   call ubicarCom
+
+   mov ah, 09h 
+   mov dl, offset varPapel ;IMPRIME LA PALABRA "PAPEL"----------------------------------------------------
+   int 21h
+
+   jmp comparajugadas
+comestijera2:
+   call ubicarCom
+
+   mov ah, 09h 
+   mov dl, offset varTijera ;IMPRIME LA PALABRA "TIJERA"--------------------------------------------------
+   int 21h
+
+   jmp comparajugadas
 
 comparajugadas:
-;=========================== C O M P A R A C I O N E S ==================================
-call compara            ;Llamar a la funcion externa
-;Evaluar resultado en AL
-cmp AL, 0
-je  emp
-cmp AL, 1
-je  gana
-cmp AL, 2
-je  lose
+   ;=========================== C O M P A R A C I O N E S ==================================
+   call compara            ;Llamar a la funcion externa
+   ;Evaluar resultado en AL
+   cmp AL, 0
+   je  emp
+   cmp AL, 1
+   je  gana
+   cmp AL, 2
+   je  lose
 
 emp:
-call bordeSup            ;LLAMA A LA FUNCION QUE IMPRIME EL BORDE SUPERIOR ------------------------------
-call ubicarCentro        ;LLAMA A LA FUNCION QUE UBICA CURSOR EN CENTRO ---------------------------------
-mov bx, offset empate    ;IMPRIME LA PALABRA EMPATE -----------------------------------------------------
-call imprimir 
+   call bordeSup            ;LLAMA A LA FUNCION QUE IMPRIME EL BORDE SUPERIOR ------------------------------
+   call ubicarCentro        ;LLAMA A LA FUNCION QUE UBICA CURSOR EN CENTRO ---------------------------------
 
-jmp fin
+   mov bx, offset empate    ;IMPRIME LA PALABRA EMPATE -----------------------------------------------------
+   call imprimir 
+
+   jmp fin
 
 ;---------------En SI guardo las partidas ganadas de J1, y en Di guardo las partidas ganadas de COM
 gana:
-call bordeInf
-call bordeSup
-call ubicarCentro
-mov bx, offset ganaste ;IMPRIME LA PALABRA GANASTE -----------------------------------------------------
-call imprimir
-add score[0], 1        ;SUMO 1 A SCORE[O] CUANDO GANA EL JUGADOR ---------------------------------------
+   call bordeInf
+   call bordeSup
+   call ubicarCentro
+   
+   mov bx, offset ganaste ;IMPRIME LA PALABRA GANASTE -----------------------------------------------------
+   call imprimir
+   
+   add score[0], 1        ;SUMO 1 A SCORE[O] CUANDO GANA EL JUGADOR ---------------------------------------
 
-jmp fin
+   jmp fin
 
 lose:
-call bordeSup
-call ubicarCentro
-mov bx, offset perdiste ;IMPRIME LA PALABRA PERDISTE -------------------------------------------------
-call imprimir
-call bordeInf
-add score[2], 1         ;SUMO 1 CUANDO GANA LA CPU ---------------------------------------------------
+   call bordeSup
+   call ubicarCentro
+   
+   mov bx, offset perdiste ;IMPRIME LA PALABRA PERDISTE -------------------------------------------------
+   call imprimir
+   
+   call bordeInf
+   add score[2], 1         ;SUMO 1 CUANDO GANA LA CPU ---------------------------------------------------
 
-jmp fin
+   jmp fin
 
 fin:
-call bordeInf
+   call bordeInf
 
-mov ah, 02h             ;UBICA AL CURSOR -----------------------------------------------------------------
-mov dh, 4
-mov dl, 25
-int 10h
+   mov ah, 02h             ;UBICA AL CURSOR -----------------------------------------------------------------
+   mov dh, 4
+   mov dl, 25
+   int 10h
 
-mov ah, 9
-mov dx, offset puntaje
-int 21h
+   mov ah, 09h
+   mov dx, offset puntaje
+   int 21h
 
-mov ah, 02h              ;UBICA AL CURSOR ----------------------------------------------------------------
-mov dh, 5
-mov dl, 25
-int 10h
+   mov ah, 02h              ;UBICA AL CURSOR ----------------------------------------------------------------
+   mov dh, 5
+   mov dl, 25
+   int 10h
 
-mov ah, 9
-mov dx, offset jugadores
-int 21h
+   mov ah, 09h
+   mov dx, offset jugadores
+   int 21h
 
-;mov bx, offset jugadores ;IMPRIME LOS JUGADORES
-;call imprimir ;LLAMA A LA FUNCION IMPRIMIR-----------------------
+   mov ah, 02h           ;UBICA AL CURSOR JUGADOR 1 ---------------------------------------------------------
+   mov dh, 6
+   mov dl, 35
+   int 10h
 
-mov ah, 02h           ;UBICA AL CURSOR JUGADOR 1 ---------------------------------------------------------
-mov dh, 6
-mov dl, 35
-int 10h
+   mov ah, 09h
+   mov dx, offset score
+   int 21h
 
-mov ah, 9
-mov dx, offset score
-int 21h
+   mov ah, 2              ;UBICA AL CURSOR ------------------------------------------------------------------
+   mov dh, 20
+   mov dl, 30
+   int 10h
 
-mov ah, 2              ;UBICA AL CURSOR ------------------------------------------------------------------
-mov dh, 20
-mov dl, 30
-int 10h
+   mov ah, 09h
+   mov dx, offset tecla   ;IMPRIMO LA PALABRA ENTER ---------------------------------------------------------
+   int 21h
+   
+   mov ah, 01h
+   int 21h
 
-mov ah, 9
-mov dx, offset tecla   ;IMPRIMO LA PALABRA ENTER ---------------------------------------------------------
-int 21h
-mov ah, 01h
-int 21h
+   cmp score[0], 33h      ;COMPARA CON 3, EL SCORE DE JUGADOR, SI LLEGA A 3 GANA ----------------------------
+   je finfin1
+   cmp score[2], 33h      ;COMPARA CON 3, EL SCORE DE LA CPU, SI LLEGA A 3 GANA -----------------------------
+   je finfin2
 
-cmp score[0], 33h      ;COMPARA CON 3, EL SCORE DE JUGADOR, SI LLEGA A 3 GANA ----------------------------
-je finfin1
-cmp score[2], 33h      ;COMPARA CON 3, EL SCORE DE LA CPU, SI LLEGA A 3 GANA -----------------------------
-je finfin2
+   jmp sigue
 
-jmp sigue
-
-mov ah, 2              ;UBICA AL CURSOR -----------------------------------------------------------------
-mov dh, 23
-mov dl, 0
-int 10h
+   mov ah, 2              ;UBICA AL CURSOR -----------------------------------------------------------------
+   mov dh, 23
+   mov dl, 0
+   int 10h
 
 finfin1:
-int 80h                ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------------
-call ubicarCentro
-mov bx, offset ganaste ;IMPRIME LA PALABRA GANASTE ------------------------------------------------------
-call imprimir
+   int 80h                ;INTERRUPCION QUE LIMPIA LA PANTALLA ---------------------------------------------
 
-jmp volver
+   call ubicarCentro
+
+   mov bx, offset ganaste ;IMPRIME LA PALABRA GANASTE ------------------------------------------------------
+   call imprimir
+
+   jmp volver
 
 finfin2:
-int 80h
-call ubicarCentro
-mov bx, offset perdiste ;IMPRIME LA PALABRA PERDISTE -------------------------------------------------------
-call imprimir
+   int 80h
+   call ubicarCentro
+   
+   mov bx, offset perdiste ;IMPRIME LA PALABRA PERDISTE -------------------------------------------------------
+   call imprimir
 
 volver:
-mov ah, 2            ;UBICA AL CURSOR -------------------------------------------------------------------
-mov dh, 19
-mov dl, 14
-int 10h
+   mov ah, 02h           ;UBICA AL CURSOR -------------------------------------------------------------------
+   mov dh, 19
+   mov dl, 14
+   int 10h
 
-mov ah, 9
-mov dx, offset vuelve   ;IMPRIME CARTEL DE LA POSIBILIDAD DE ELEGIR ENTRE VOLVER A JUGAR O SALIR DEL PROGRAMA
-int 21h
+   mov ah, 09h
+   mov dx, offset vuelve   ;IMPRIME CARTEL DE LA POSIBILIDAD DE ELEGIR ENTRE VOLVER A JUGAR O SALIR DEL PROGRAMA
+   int 21h
 
 pregunto:
-mov ah, 1
-int 21h
+   mov ah, 01h
+   int 21h
 
-cmp al, 'S'
-je sigojugando
-cmp al, 's'
-je sigojugando
-cmp al, 'N'
-je termina
-cmp al, 'n'
-je termina
-jmp pregunto
+   cmp al, 'S'
+   je sigojugando
+   cmp al, 's'
+   je sigojugando
+   cmp al, 'N'
+   je termina
+   cmp al, 'n'
+   je termina
+   jmp pregunto
 
 sigojugando:
-mov score[0], 30h
-mov score[2], 30h
+   mov score[0], 30h
+   mov score[2], 30h
 
-jmp sigue
+   jmp sigue
 
 termina: 
     int 80h
